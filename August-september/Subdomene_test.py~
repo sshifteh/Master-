@@ -1,0 +1,11 @@
+
+from numpy import * 
+
+def f(x):
+    return x*x
+
+start = 0
+stop = 1
+steps = 10 
+x = linspace(start,stop,step)
+print x 

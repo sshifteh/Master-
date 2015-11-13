@@ -1,0 +1,96 @@
+from dolfin import *
+
+# dXX is a measure or volume integral, when it makes sense,
+# for a triangle its area
+# for a line its length
+# for a cute its volute
+def solve_poisson(mesh, dXX, f):
+    V = FunctionSpace(mesh, 'CG', 1)
+    u = TrialFunction(V)
+    v = TestFunction(V)
+    
+    a = inner(grad(u), grad(v))*dXX + inner(u, v)*dXX # Using helmholtz equation so that it will be N.bcd in all around the rectangle
+    L = inner(f, v)*dXX 
+    
+    A, b = assemble_system(a, L)                      # assebling the system in this manner avoid nan
+    A.ident_zeros()                                   # because nan entries are substituted with zero 
+    
+    uh = Function(V)                                  # the solution of the Helmholtz equation by FE
+    solve(A, uh.vector(), b)                          # the linear system solved by a lin.alg backend
+
+    return uh                                         # the solution is returned 
+    
+
+
+def solve_stokes(msh, dXX, f, bcs):
+	V    = VectorFunctionSpace(mesh, 'CG', 2)
+	P    = FunctionSpace(mesh, 'CG', 1)
+	W    = MixedFunctionSpace([V,P])
+	u, p = TrialFunctions(W)
+	v, q = TestFunctions(W)
+ 	a    = inner(grad(u), grad(v))*dx + div(u)*q*dx + div(v)*p*dXX
+	L    = inner(f, v)*dXX
+	UP   = Function(W)
+	A, b = assemble_system(a, L, bcs)             # Remember about bcs
+	
+	solve(A, UP.vector(), b, "lu")
+		
+	U, P = UP.split()
+
+	plot(U, interactive = True, title= "Velocity, vector valued function, approximated by FE")
+	plot(P, interactive = True, title= "Pressure, scalar valued function, appriximated by FE")
+
+	return U,P
+
+
+
+    
+# ---------------------------------------------------------------------------
+
+# HW1: How do you handle boundary conditions? how to divide and give value to what is now marked
+# HW2: What is the complexity of the algorithm. See WIKI for complexity! hos much does it cost, computational cost that is. 
+# HW3: Can you make a more efficient algorithm? The for loops are not the problem here. There is other room for improvement in the script.
+
+if __name__ == '__main__':
+    import numpy as np
+    
+    N = 20
+    full_mesh = RectangleMesh(Point(-1, -1), Point(1, 1), N, N)   # 
+    
+    timer = Timer('marking')
+    
+    active_cells = CellFunction('size_t', full_mesh, 0)
+    
+    width = 0.25
+    active_domain = AutoSubDomain(lambda x, on_boundary: abs(x[0]) < width)
+    active_domain.mark(active_cells, 1)
+    #plot(active_cells, interactive=True)
+     
+    edge_f = FacetFunction('size_t', full_mesh, 0)
+    full_mesh.init(2, 1)
+    full_mesh.init(1, 2)
+
+    ac_values = active_cells.array()
+    for cell in SubsetIterator(active_cells, 1):
+        for edge in edges(cell):
+	    print ac_values[edge.entities(2)]
+            if np.sum(ac_values[edge.entities(2)]) == 1:
+                edge_f[edge] = 1   
+            
+    print timer.stop()                
+    print edge_f.array()
+    plot(edge_f, interactive=True)
+    
+    
+    # dXX = Measure('dx', domain=full_mesh, subdomain_data=active_cells, subdomain_id=1)    
+    
+    # print assemble(1*dXX)
+    
+    # f = Expression('1 + sin(4*x[0])*x[1]')
+    # uh = solve_poisson(full_mesh, dXX, f)
+    
+    # plot(uh)
+    # interactive()
+    
+    # print uh.vector().array()
+    

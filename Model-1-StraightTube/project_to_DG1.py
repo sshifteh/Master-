@@ -18,6 +18,7 @@ V = FunctionSpace(mesh, 'DG', 1)
 f = interpolate(fexp, V)
 # The claim is that for such f, (f.dx(i), v) = 0
 v = TestFunction(V)
+
 print 'Projecting from DG1 to DG1'
 for i in range(2):
     b_form = inner(f.dx(i), v)*dx

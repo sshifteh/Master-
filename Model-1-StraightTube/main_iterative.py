@@ -30,11 +30,14 @@ class Bottom(SubDomain):
                10.0/50-DOLFIN_EPS < x[1] < 40.0/50+DOLFIN_EPS 
 
 
-class Top(SubDomain):
     def inside(self, x, on_boundary):
         return x[0] < 40./50 + DOLFIN_EPS and \
                10.0/50-DOLFIN_EPS < x[1] < 40.0/50+DOLFIN_EPS 
 
+class Top(SubDomain):
+    def inside(self, x, on_boundary):
+        return x[0] < 40./50 + DOLFIN_EPS and \
+               10.0/50-DOLFIN_EPS < x[1] < 40.0/50+DOLFIN_EPS 
 
 
 # GENARAL CLASS FOR MAKING AN EXPRESSION OF ITEMS IN LIST 
@@ -51,7 +54,7 @@ class SubDomainIndicator(Expression):
 
 subdomains = CellFunction('size_t', mesh, 1)
 Bottom().mark(subdomains, 0)
-Top().mark(subdomains, 0)
+#Top().mark(subdomains, 0)
 #Right().mark(subdomains, 0)
 #Left().mark(subdomains, 0)
 
@@ -66,7 +69,7 @@ interesting_domain_proj = project(interesting_domain, DG1)
 
 def iterative(K_1):
 
-	U, P, K_Func = stokes_solver(w=w, mesh=mesh, Vspace=Vspace, Pspace=Pspace, Wspace=Wspace, DG1=Pspace, K_array=K_1, n=n )
+	U, P, K_Func = stokes_solver(w=w, mesh=mesh, Vspace=Vspace, Pspace=Pspace, Wspace=Wspace, DG1=DG0, K_array=K_1, n=n )
 
 
 	# Verification: 
@@ -108,12 +111,12 @@ def iterative(K_1):
 	# WSS skal naturlig veare i DG1.
 	# og det fungerte aa bytte Pspace m DG1 
 	
-	wss = WSS(U=U, DG1= DG1) #Pspace) #,interesting_domain = interesting_domain_proj)
-	bdry_ = bdry(K_Func = K_Func, DG1 = DG1)
+	wss = WSS(U=U, DG1= DG1, mesh=mesh) #Pspace) #,interesting_domain = interesting_domain_proj)
+	bdry_ = bdry(mesh = mesh, DG0=DG0, DG1=DG1) #K_Func = K_Func, DG1 = DG1)
+
 
 	# Simon: 
 	# DG1 osgaa inneholder CG1 
-
 
 	ind_f = ind_func(bdry=bdry_, WSS = project(wss, DG1), DG1 = DG0, interesting_domain = interesting_domain_proj)
 	K_new = K_update(ind_func = ind_f, K_Func = K_Func)
@@ -124,16 +127,19 @@ def iterative(K_1):
 	plot(K_new, interactive = True, title = 'K new ')
 	K_capped = capping(K_new)
 	plot(K_capped, interactive = False, title = 'K capped')
-	stokes_solver(w=w, mesh=mesh, Vspace=Vspace, Pspace=Pspace, Wspace=Wspace, K_array=K_capped, n=n )
+	stokes_solver(w=w, mesh=mesh, Vspace=Vspace, Pspace=Pspace, Wspace=Wspace,DG1=DG1, K_array=K_capped, n=n )
 
 	return K_capped 
+
 	
 
 iterative(K_1=K_1)
+
+
 
 for i in range(5):
 	K_updated = iterative(K_1 = K_1)
 	K_1= K_updated # this didnt work 
 	
-
+ 
 

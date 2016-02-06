@@ -30,14 +30,79 @@ def WSS_bdry(K_Func, DPspace, WSS):
 	return WSS_bdry_Function 
 
 
+"""
 def bdry(K_Func, DG1):
         n = FacetNormal(DG1.mesh())
+
         u = TrialFunction(DG1) 
         v = TestFunction(DG1) 
-        a = avg(u)*avg(v)*dS() + v*u*ds()
-	L = inner(jump(K_Func,n), jump(K_Func, n))*avg(v)*dS()
         
+	a = avg(u)*avg(v)*dS() + v*u*ds()
+	L = inner(jump(K_Func,n), jump(K_Func, n))*avg(v)*dS()
+        #L = jump(K_Func)**2 * avg(v) * dS()
+
 	bdry_func = Function(DG1)
         solve(a == L, bdry_func)
-	plot(bdry_func, interactive = True, title = 'bdry')
+	bdry_cg1 = interpolate(bdry_func, FunctionSpace(refine(bdry_func.function_space().mesh()), "CG", 1))
+	from IPython import embed; embed()	
+	plot(bdry_cg1, interactive = True, title = 'bdry')
 	return bdry_func
+
+"""
+
+
+def bdry(mesh, DG0, DG1):
+
+	import numpy as np
+
+	#mesh = UnitSquareMesh(20, 20)
+	#DG1 =FunctionSpace(mesh, 'DG', 1) 	# ShearStressSpace
+	#DG0 = FunctionSpace(mesh, 'DG', 0)	# DPspace CHANGE this name to DG0 much more intuitive than discont. pressure space
+	
+	w = 0.45
+	K_1  = Expression('(x[0] > w - DOLFIN_EPS && x[0] < 1 - w + DOLFIN_EPS) ? 0.0 : 1.0', w=w)   
+	K_1 = interpolate(K_1, DG0)
+	
+	# Which edges are such that the connected cells have different values
+	facet_f = FacetFunction('size_t', mesh, 0)
+	K1_values = K_1.vector().array()
+	mesh.init(1, 2)
+	for facet in facets(mesh):
+	    connected_cells = facet.entities(2)
+	    dofs = [DG0.dofmap().cell_dofs(cell)[0] for cell in connected_cells]
+	    if len(dofs) > 1:
+	        one, two = K1_values[dofs]
+	        if abs(two-one) > 0:
+	            facet_f[facet] = 1
+	
+	# Now that I found them, which cells are connected to them
+	cell_f = CellFunction('size_t', mesh, 0)
+	facet_f_values = facet_f.array()
+	mesh.init(2, 1)
+	for cell in cells(mesh):
+	    if np.sum(facet_f_values[cell.entities(1)]) > 0:
+	        cell_f[cell] = 1
+	
+
+
+	plot(facet_f, interactive = True, title = 'facet_f')
+	plot(K_1, interactive = True, title = 'K_1')
+	plot(cell_f, interactive = True, title = 'cell_f')
+	interactive()
+
+
+	cell_f_interpolated = project(cell_f, DG0) # get invalid type conversion 
+
+	
+	print 'type cell_f = ', type(cell_f)
+
+	
+
+
+	return cell_f 
+
+
+
+
+
+

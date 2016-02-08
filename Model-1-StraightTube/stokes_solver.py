@@ -18,7 +18,7 @@ def stokes_solver(w, mesh, Vspace, Pspace, Wspace, Kspace, K_array, n):
 	L = inner(f, v)*dx
 	UP = Function(Wspace)
 
-	velocityFunc = Expression(["0","-(x[0]-0.45)*(x[0]-0.55)"])
+	velocityFunc = Expression(["0","-10*(x[0]-0.45)*(x[0]-0.55)"])
 
 
 	def u_boundaryBottom(x, on_bnd):
@@ -37,20 +37,12 @@ def stokes_solver(w, mesh, Vspace, Pspace, Wspace, Kspace, K_array, n):
 		return x[1] < 1 - DOLFIN_EPS and x[0] > w and x[0] < 1-w and on_bnd
 
 
-	# SIMON:
-	# Project to the function space, plot it and see
-	# plot the expression if provide the mesh argument
-	# this didnt work
-	# velocity_profile = project(velocityFunc, Pspace)
-	# plot(velocity_profile, interactive = True, title = 'velocity parabolic profile')
-
 	inlet  = DirichletBC(Wspace.sub(0), velocityFunc, u_boundaryBottom)
 	restBottom = DirichletBC(Wspace.sub(0), Constant((0.0,0.0)), restBottom)
 	right = DirichletBC(Wspace.sub(0), Constant((0.0,0.0)), rightWall)
 	left = DirichletBC(Wspace.sub(0), Constant((0.0,0.0)), leftWall)
 
 	#top = DirichletBC(Wspace.sub(0), Constant((0.0,0.0)), outlet)
-
 
 	# Make dirichlet bcs overalt unntatt outletene
 	#rightOutlet  = DirichletBC(Wspace.sub(1), Constant(0.0), p_boundaryRightWall)

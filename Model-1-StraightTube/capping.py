@@ -1,56 +1,29 @@
 from dolfin import * 
-
+from numpy import where 
 
 def capping(K_Func):
 	"""
 	Creating a 'homogenous' fluid domain, 
 	in the sense that the fluid domain is level set 0,
 	while solid domain is level set 1.
-	Not sure of the terminology though. 
 	"""	
 	
+	K = K_Func.vector() # vector of length 5000
 
 	
-	alist = K_Func.vector().array()  # copi of the K_Func vector data 
-	print alist # vector of size 2601 	
-
-	for a in range(len(alist)):
-		#print alist[a]
-		if alist[a] >= 0.5:
-			alist[a] = 1.0
-
-		elif alist[a]  < 0.5:
-			alist[a] = 0
-
-		# dont think I even need this line, either they are above or below a half
-		else:
-			alist[a] = alist[a]
-
-	# test for negative values 
-	#for a in alist:
-	#	if a<0:
-	#		print a
-		
+	solid = where(K >= 0.5)[0]
+	fluid = where(K < 0.5)[0]
 	
-	"""
-	vectorized version FIXME 	
-	K_Func.vector()[K_Func.vector() > 1.0]  = 1.0
-	K_Func.vector()[K_Func.vector() < 0] = 0
-	K_updated = project(K_Func, K_Func.function_space())
-	#plot(K_updated, interactive = True, title = 'K capped')		
-	"""	
-	
-	# Put the copi back into K_Func
-	K_Func.vector()[:]= alist[:]
 
-	# again test for negative values 	
-	for k in K_Func.vector():
-		if k <0:
-			print k 
-		
-	K_updated = project(K_Func, K_Func.function_space())
+	capping = Function(K_Func.function_space())
+	capping.vector()[solid] = 1.0
+	capping.vector()[fluid] = 0			 
+
 	
-	return K_updated 
+	K_ = interpolate(capping, K_Func.function_space())	
+	plot(K_)
+	
+	return K_ 
 
 
 	

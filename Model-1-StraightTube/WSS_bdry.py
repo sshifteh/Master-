@@ -42,10 +42,13 @@ def bdry(mesh, K_Func, DG0):
 	# Which edges are such that the connected cells have different values
 	facet_f = FacetFunction('size_t', mesh, 0)
 	K1_values = K_Func.vector().array()
-	mesh.init(1, 2)
+	mesh.init(1, 2)   # in the mesh loop up cells that are connected to en edge mesh.init(2,3) means which side is connected to which pyramid
+	# this bulids a table with index for
+	# fenics knows for each cell which vertices make it up. 
 	for facet in facets(mesh):
 	    connected_cells = facet.entities(2)
 	    dofs = [DG0.dofmap().cell_dofs(cell)[0] for cell in connected_cells]
+			
 	    if len(dofs) > 1:
 	        one, two = K1_values[dofs]
 	        if abs(two-one) > 0:

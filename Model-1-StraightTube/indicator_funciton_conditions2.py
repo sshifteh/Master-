@@ -38,10 +38,16 @@ def ind_func(bdry, WSS, interesting_domain):
         indicator_function.vector()[growth] = 1
         indicator_function.vector()[shrink] = -1
 
+	#from IPython import embed; embed()
+
+	# Naar interpolerer sa tar man verdien som er midt pa cellen fx 1/3
+	# Magne tegnet det 
+	# careful about interpolating from DG0 to DG1 
 	
 
         #plot(interpolate(indicator_function, DG0), interactive=True, title = 'indicator function in DG0')
         #plot(interpolate(bdry, DG0), interactive=True)
 	
+
 
         return indicator_function

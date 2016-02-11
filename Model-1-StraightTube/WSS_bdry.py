@@ -15,21 +15,23 @@ def WSS_bdry(K_Func, DPspace, WSS):
 
 
 
-def bdry_old(K_Func, DG1):
-        n = FacetNormal(DG1.mesh())
+def bdry_old(K_Func, Kspace): 
+        n = FacetNormal(Kspace.mesh())
 
-        u = TrialFunction(DG1)
-        v = TestFunction(DG1)
+        u = TrialFunction(Kspace)
+        v = TestFunction(Kspace)
 
 	a = avg(u)*avg(v)*dS() + v*u*ds()
-	L = inner(jump(K_Func,n), jump(K_Func, n))*avg(v)*dS()
-        #L = jump(K_Func)**2 * avg(v) * dS()
+	#L = inner(jump(K_Func,n), jump(K_Func, n))*avg(v)*dS()
+        L = jump(K_Func)**2 * avg(v) * dS()
 
-	bdry_func = Function(DG1)
+	bdry_func = Function(Kspace)
         solve(a == L, bdry_func)
-	bdry_cg1 = interpolate(bdry_func, FunctionSpace(refine(bdry_func.function_space().mesh()), "CG", 1))
-	from IPython import embed; embed()
-	plot(bdry_cg1, interactive = True, title = 'bdry')
+	
+	#bdry_cg1 = interpolate(bdry_func, FunctionSpace(refine(bdry_func.function_space().mesh()), "CG", 1))
+	
+	#from IPython import embed; embed()
+	#plot(bdry_cg1, interactive = True, title = 'bdry')
 	return bdry_func
 
 

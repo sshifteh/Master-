@@ -4,13 +4,13 @@ from K_update import K_update
 from capping import capping
 from stokes_solver import stokes_solver
 from WSS import WSS
-from WSS_bdry import WSS_bdry, bdry
+from WSS_bdry import bdry_old #WSS_bdry, bdry
 from indicator_funciton_conditions2 import ind_func
 
 
 n = 50
 w= 0.45
-mesh = UnitSquareMesh(n,n) #, 'crossed')
+mesh = UnitSquareMesh(n,n) #'crossed')
 
 DG1 =FunctionSpace(mesh, 'DG', 1)
 DG0 = FunctionSpace(mesh, 'DG', 0)
@@ -64,20 +64,22 @@ def iterative(K_1):
 	U, P, K_Func = stokes_solver(w=w, mesh=mesh, Vspace=Vspace,
                 Pspace=Pspace, Wspace=Wspace, Kspace=Kspace, K_array=K_1, n=n )
 
-	wss = WSS(U, WSSspace, mesh)
+	wss = WSS(U, Kspace, mesh) #WSSspace, mesh)
 	plot(wss, interactive = True, title = 'wss')	
-	bdry_ = bdry(mesh, K_Func, DG0)
+	
+	#bdry_ = bdry(mesh, K_Func, DG0)
+	bdry_ = bdry_old(K_Func, Kspace)	
+
 	plot(bdry_, interactive = True, title = 'bdry_')
 
+
 	ind_f = ind_func(bdry_, wss, interesting_domain_proj)
-	        
-	# Simon: indicator_function is currently in DG1, but your K_Func in DG0.
-        # Hence you might need to interpolate indicator_function to DG0
-	plot(ind_f, interactive=True, title='Indicator function')
-	
+	ind_f = interpolate(ind_f, Kspace)	
+	plot(ind_f, interactive=True, title='Indicator function')	
 	K_new = K_update(ind_func = ind_f, K_Func = K_Func)
-	plot(K_new, interactive = True, title = 'K_updated ')
+	plot(K_new, interactive = True, title = 'K_new ')
 	K_capped = capping(K_new)
+
 	plot(K_capped, interactive = False, title = 'K capped')
 	stokes_solver(w=w, mesh=mesh, Vspace=Vspace, Pspace=Pspace,
                 Wspace=Wspace, Kspace=Kspace, K_array=K_capped, n=n )

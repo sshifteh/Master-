@@ -1,21 +1,27 @@
 
 from dolfin import *
-from K_update import K_update
+from K_update import update_K
 from capping import capping
 from stokes_solver import stokes_solver
 from WSS import WSS
-from WSS_bdry import bdry_old #WSS_bdry, bdry
+from WSS_bdry import bdry
 from indicator_funciton_conditions2 import ind_func
 
+show_plot = True
+def plot(*args, **kwargs):
+    if not show_plot:
+        return
+    dolfin.plot(*args, **kwargs)
 
-n = 50
-w= 0.45
+n = 40
+w = 0.25
 mesh = UnitSquareMesh(n,n) #'crossed')
 
+CG1 =FunctionSpace(mesh, 'CG', 1)
 DG1 =FunctionSpace(mesh, 'DG', 1)
 DG0 = FunctionSpace(mesh, 'DG', 0)
 
-Pspace = FunctionSpace(mesh, 'CG',1)
+Pspace = CG1
 Vspace = VectorFunctionSpace(mesh, 'Lagrange', 2)
 Pspace = FunctionSpace(mesh, 'Lagrange', 1)
 Wspace = MixedFunctionSpace([Vspace, Pspace])
@@ -23,74 +29,45 @@ Wspace = MixedFunctionSpace([Vspace, Pspace])
 Kspace = DG0
 WSSspace = DG1
 
-K_1  = Expression('(x[0] > w - DOLFIN_EPS && x[0] < 1 - w + DOLFIN_EPS) ? 0.0 : 1.0', w=w)
+K_expr = Expression('(x[0] > w - DOLFIN_EPS && x[0] < 1 - w + DOLFIN_EPS) ? 0.0 : 1.0', w=w)
+K = interpolate(K_expr, Kspace)
 
+u = Function(Vspace)
 
-# INTERESTING DOMAIN:
-class Bottom(SubDomain):
-    def inside(self, x, on_boundary):
-        return x[0] > 10./50 + DOLFIN_EPS and \
-               10.0/50-DOLFIN_EPS < x[1] < 40.0/50+DOLFIN_EPS
+def iterative(K, iters):
 
-class Top(SubDomain):
-    def inside(self, x, on_boundary):
-        return x[0] < 40./50 + DOLFIN_EPS and \
-               10.0/50-DOLFIN_EPS < x[1] < 40.0/50+DOLFIN_EPS
+    for i in range(iters):
+	# Solve for velocity and pressure
+	U, P = stokes_solver(w, mesh, Vspace, Pspace, Wspace, K)
+        u.vector()[:] = project(U, Vspace).vector()
+        plot(u, title="Velocity")
 
+	# Compute wall shear stress
+	wss_ = WSS(U) 
+        
+	# We project the wall shear stress to have it in the 
+	# same space as the geometry space
+	wss = project(wss_, CG1)
+	wss = interpolate(wss, Kspace)
+	#plot(wss, title = 'wss')	
 
-# GENARAL CLASS FOR MAKING AN EXPRESSION OF ITEMS IN LIST
-class SubDomainIndicator(Expression):
-    def __init__(self, subdomain_list):
-		self.subdomain_list = subdomain_list
+	# Cmpute boundary	
+	bdry_ = bdry(K, DG0)
+	#plot(bdry_, title = 'bdry_')
 
-    def eval(self, values, x):
-        values[0] = 0.
-        for subdomain in self.subdomain_list:
-            if subdomain.inside(x, 0):
-                values[0] = 1.
-                break
+	# Compute indicator function
+	ind_f = ind_func(bdry_, wss) #, interesting_domain_proj)
+	#plot(ind_f, title='Indicator function')	
 
-subdomains = CellFunction('size_t', mesh, 1)
-Bottom().mark(subdomains, 0)
-#Top().mark(subdomains, 0)
-
-interesting_domain = SubDomainIndicator([Bottom(), Top()])
-plot(interesting_domain, mesh=mesh, interactive=True, title="Interesting domain")
-interesting_domain_proj = project(interesting_domain, DG1)
-
-
-def iterative(K_1):
-
-	U, P, K_Func = stokes_solver(w=w, mesh=mesh, Vspace=Vspace,
-                Pspace=Pspace, Wspace=Wspace, Kspace=Kspace, K_array=K_1, n=n )
-
-	wss = WSS(U, Kspace, mesh) #WSSspace, mesh)
-	plot(wss, interactive = True, title = 'wss')	
+	# Update K
+	update_K(ind_f, K)
 	
-	#bdry_ = bdry(mesh, K_Func, DG0)
-	bdry_ = bdry_old(K_Func, Kspace)	
+	# Cap K
+	capping(K)
+	plot(K, title='K')
 
-	plot(bdry_, interactive = True, title = 'bdry_')
+	yield K
 
-
-	ind_f = ind_func(bdry_, wss, interesting_domain_proj)
-	ind_f = interpolate(ind_f, Kspace)	
-	plot(ind_f, interactive=True, title='Indicator function')	
-	K_new = K_update(ind_func = ind_f, K_Func = K_Func)
-	plot(K_new, interactive = True, title = 'K_new ')
-	K_capped = capping(K_new)
-
-	plot(K_capped, interactive = False, title = 'K capped')
-	stokes_solver(w=w, mesh=mesh, Vspace=Vspace, Pspace=Pspace,
-                Wspace=Wspace, Kspace=Kspace, K_array=K_capped, n=n )
-
-	return K_capped
-
-
-iterative(K_1=K_1)
-for i in range(5):
-	K_updated = iterative(K_1 = K_1)
-	K_1= K_updated 
-
-
-
+plot(K, title="K")
+for K in iterative(K, 50):
+    pass

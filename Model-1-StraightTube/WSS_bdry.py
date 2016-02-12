@@ -5,6 +5,9 @@ def WSS_bdry(K_Func, DPspace, WSS):
 
 
 	bdry= grad(K_Func)**2
+	
+	n = FacetNormal(Kspace.mesh())
+	bdry = inner(K_Func, n)	
 	WSS_bdry = WSS*bdry # only if ur at the bdry AND the wss is nonzero
 	# keept the bdry and wss separate
 	
@@ -37,9 +40,11 @@ def bdry_old(K_Func, Kspace):
 
 
 
-def bdry(mesh, K_Func, DG0):
+def bdry(K_Func, DG0):
 
 	import numpy as np
+
+	mesh = K_Func.function_space().mesh()
 
 	# Which edges are such that the connected cells have different values
 	facet_f = FacetFunction('size_t', mesh, 0)

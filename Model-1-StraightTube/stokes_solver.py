@@ -1,8 +1,7 @@
 from alpha import alpha
 from dolfin import *
 
-
-def stokes_solver(w, mesh, Vspace, Pspace, Wspace, Kspace, K_array, n):
+def stokes_solver(w, mesh, Vspace, Pspace, Wspace, K):
 	"""
 	Solves the Stokes equation
 	"""
@@ -10,15 +9,13 @@ def stokes_solver(w, mesh, Vspace, Pspace, Wspace, Kspace, K_array, n):
 	u, p = TrialFunctions(Wspace)
 	v, q = TestFunctions(Wspace)
 
-	K_Func  = interpolate(K_array, Kspace) # Kontroll function
-	#plot(K_Func, interactive = False, title = 'Control Domain to be solved over')
-
 	f = Constant([0.0,0.0])
- 	a = inner(alpha(u, K_Func), v)*dx + inner(grad(u), grad(v))*dx + div(u)*q*dx + div(v)*p*dx
+ 	a = inner(alpha(u, K), v)*dx + inner(grad(u), grad(v))*dx + div(u)*q*dx + div(v)*p*dx
 	L = inner(f, v)*dx
 	UP = Function(Wspace)
 
-	velocityFunc = Expression(["0","-10*(x[0]-0.45)*(x[0]-0.55)"])
+        speed = 10
+	velocityFunc = Expression(["0","-speed*(x[0]-0.45)*(x[0]-0.55)"], speed=speed)
 
 
 	def u_boundaryBottom(x, on_bnd):
@@ -52,14 +49,12 @@ def stokes_solver(w, mesh, Vspace, Pspace, Wspace, Kspace, K_array, n):
 
 
 	A, b = assemble_system(a, L, bcs)
-	solve(A, UP.vector(), b, "lu")
+
+        solver = LUSolver(A)
+	solver.solve(UP.vector(), b)
 	U, P = UP.split()
 	n = FacetNormal(mesh)
 	print "Mass conservation: ", assemble(inner(U, n)*ds)
 
-
-	#file = File('Stokes_flow.xdmf')
-	#file << U
-
-	return U,P, K_Func
+	return U, P
 

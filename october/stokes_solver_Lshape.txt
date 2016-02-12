@@ -1,0 +1,119 @@
+
+def alpha(u, k):
+	C = Constant(1e5) # high value outside the vessel
+	return C*k*u
+
+
+
+
+
+def stokes_solver(w, func, n = 50 ):
+	"""
+	* Introduction: 
+	Solver for a the stokes problem with a penalty term with Fenics. 
+
+
+	* * THE MATHEMATICS: 
+	The stokes_solver is a function that solves the Stokes boundary value problem, by converting it to the weak
+	form by multiplying by a testfunction v and doing integration over the domain.
+	Consider the testfunction v as a virtual displacement close to the solution u (at least for now) 
+	Then a a penalty term is added. (what is the definition of a penalty term... wikipedia )
+	Consider that we now add a fourth term, alpha = C*k*u, inner(alpha(u, k), v)*dx 
+	This term is a so called penalty term. Whenever the domain is divided, the part of the domain with flow should have alpha term 		equate to zero and the part without flow should have alpha term go to infinity. 	
+	Based on literatuer we choose alpha. 
+
+
+	Strong form:
+		
+			- div*(grad(u))  +  grad(p)  = f  (conservation of momentum),
+					    div(u)   = 0   (conservation of mass)                       
+				    	 + boundary conditions.
+			
+	Weak form: 	
+
+	       inner(grad(u), grad(v))*dx +  div(v)*p*dx = inner(f,v)*dx
+					     div(u)*q*dx = 0  	
+
+
+	Modified weak form with penalty:  	
+
+		alpha = 0 if domain with flow, else infinity 
+		alpha = alpha(u) = C*k*u, C  = a high number 
+	       	inner(alpha(u, k), v)*dx + inner(grad(u), grad(v))*dx + div(u)*q*dx + div(v)*p*dx = 0
+	when C goes to infinity, the u in the first term in the equation above has to go to zero, 
+	for the entire equation to be zero. 
+			
+	We	
+
+	
+	
+	
+
+		
+		
+	
+	
+	"""
+
+	mesh = UnitSquareMesh(n,n)
+	
+	Tspace = TensorFunctionSpace(mesh, "DG", 1)	
+	Vspace = VectorFunctionSpace(mesh, 'Lagrange', 2)
+	Pspace = FunctionSpace(mesh, 'Lagrange', 1)
+	Wspace = MixedFunctionSpace([Vspace, Pspace]) 
+
+	u, p = TrialFunctions(Wspace)
+	v, q = TestFunctions(Wspace)
+	
+	k   = interpolate(func, Pspace)                                               # Functions object 
+	plot(k, interactive = True, title = 'tube with CG elements')
+
+	f = Constant([0.0,0.0]) 
+ 	a = inner(alpha(u, k), v)*dx + inner(grad(u), grad(v))*dx + div(u)*q*dx + div(v)*p*dx
+	L = inner(f, v)*dx
+	UP = Function(Wspace)
+
+	# boundary conditions : 
+	def u_boundaryBottom(x, on_bnd):
+		return x[1] < DOLFIN_EPS and x[0] > w and x[0] < 1-w and on_bnd
+	 	
+	def p_boundaryRightWall(x, on_bnd):
+		return x[0] > 1- DOLFIN_EPS and x[1] >= 0.5 and x[1] < 0.7 and on_bnd # why is it read on the entire unitsquare boundary?S 
+	
+	bc_u_B  = DirichletBC(Wspace.sub(0), Constant((0.0,1.0)),u_boundaryBottom)
+	bc_p_R  = DirichletBC(Wspace.sub(1), Constant(0.0), p_boundaryRightWall)
+	bcs = [bc_u_B, bc_p_R]
+
+
+
+
+	# Solve system of linear equations
+	A, b = assemble_system(a, L, bcs)
+	solve(A, UP.vector(), b, "lu")
+		
+	U, P = UP.split()
+	plot(U, interactive = True, title= "Velocity, vector valued function, approximated by FE")
+	plot(P, interactive = True, title= "Pressure, scalar valued function, appriximated by FE")
+
+	stress = project(0.5*(grad(U) + transpose(grad(U))), Tspace)
+
+	plot(stress.sub(0), title="stress", interactive=True)
+	return U, P
+
+
+if __name__ == '__main__':
+	from dolfin import * 
+	w   = 0.3
+	
+	
+	# Expression for a Straight Tube 	
+	f1  = Expression('(x[0] > w && x[0] < 1 - w ) ? 0.0 : 1.0', w=w)   
+	# Expression for a T shape
+	f2  = Expression('(x[0] > w && x[0] < 1- w && x[1] < 0.5 || x[1] >= 0.5 && x[1] < 0.7 && x[0] > w )? 0.0:1.0', w=w)	
+	# Expression for a L shape 
+	f3  = Expression('(x[0] > w && x[0] < 1- w && x[1] < 0.5 || x[1] >= 0.5 && x[1] < 0.7  )? 0.0:1.0', w=w)	
+	
+	stokes_solver(w=w, func=f3)
+	
+
+

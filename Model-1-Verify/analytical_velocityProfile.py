@@ -56,9 +56,9 @@ for cell_no in range(len(subdomains.array())):
 mesh2 = UnitSquareMesh(10,10) 
 class MyExpression(Expression):
 	def eval(self, x, values):
-		#print type(values), values.flags, 'hei paa deg'
-		# HACK:  
-		# TODO hvorfor er den satt til False i biblioteket? en god grunn? 		
+		#print type(values), values.flags, 'hei paa deg'		 
+		# TODO hvorfor er den satt til False i biblioteket? en god grunn? en feil? 		
+		# HACK: 		
 		values.flags.writeable = True 
 		if  0.45 <= x[0] <= 0.55:
 			# inside pipe

@@ -435,7 +435,7 @@ if __name__ == '__main__':
 
 	# PLOTTING A LOGARITMIC PLOT OF THE ERROR AS A FUNCTION OF THE MESH SIZE 
 	import pylab as pylab 
-	enable_plot = False
+	enable_plot = True
 	if enable_plot:
 		pylab.loglog(h_values, error_values, 'g-o' ) 
 		#pylab.plot(h_values, error_values, 'b-o')	

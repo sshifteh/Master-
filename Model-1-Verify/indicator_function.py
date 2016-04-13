@@ -5,7 +5,7 @@ from numpy import where
 def indicator_function(bdry, WSS):
 	
 	wss_ = WSS.vector().array()
-        # Project bdry to the wall shear stress function space to ensure
+        # Project bdry to the shear stress function space to ensure
         # that both of them live in the same space. No loss of information
         # occurs here.
 	# i.e bdry goes from living in DG0 to DG1
@@ -22,7 +22,9 @@ def indicator_function(bdry, WSS):
         #DG0 = FunctionSpace(WSS.function_space().mesh(), "DG", 0)
         #plot(interpolate(wss_bdry, DG0), interactive=True)
         wss_bdry = wss_[bdry_idx]
-
+	print wss_bdry
+	
+	
 	print ''
         print "Max / min WSS at boundary: {} / {}".format(max(abs(wss_bdry)),
                 min(abs(wss_bdry)))
@@ -31,7 +33,8 @@ def indicator_function(bdry, WSS):
 		
 	# Self-defined threshold values defining growth or shrinking of the vessel 	
 	#thresh_L = 0.7; thresh_H = 1.
-	thresh_L = 0.0006; thresh_H = 0.0028
+	#thresh_L = 0.0006; thresh_H = 0.0028
+	thresh_L = 0.004; thresh_H = 0.002
 	assert thresh_L < thresh_H
 
         growth = where((abs(wss_) > thresh_H) & (bdry_ > DOLFIN_EPS))[0]

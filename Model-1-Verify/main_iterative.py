@@ -64,7 +64,7 @@ def iterative(K, iters):
 	# Compute wall shear stress
 	wss_ = WSS(U) 
         
-	# We project the wall shear stress to have it in the 
+	# We project the shear stress to have it in the 
 	# same space as the geometry space
 	wss = project(wss_, CG1)
 	wss = interpolate(wss, Kspace)

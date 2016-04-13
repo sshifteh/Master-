@@ -3,9 +3,6 @@ from numpy import where
 
 def capping(K):
 	"""
-	Creating a 'homogenous' fluid domain, 
-	in the sense that the fluid domain is level set 0,
-	while solid domain is level set 1.
 	The isocontour is at 1/2
 	"""	
 	

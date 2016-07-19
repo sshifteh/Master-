@@ -2,6 +2,7 @@
 import numpy
 from matplotlib import pyplot
 from dolfin import * 
+
 # LEVEL SET FUNCTIONS, WSS, INDICATOR
 from stokes_solver import stokes_solver
 from skjaer_vegg_indikator import tau_xy, interface, indicator   
@@ -43,14 +44,11 @@ DG1 = FunctionSpace(mesh, 'DG',1)
 
 
 
-
 # The surface
-phi_I = Expression('( x[0] > (x0 - R - DOLFIN_EPS) && x[0] < (x0 + R + DOLFIN_EPS)) ? 0.0 : 1.0', x0 = x0, R = R )
+phi_I = Expression('( x[0] > (x0 - R - DOLFIN_EPS) && x[0] < (x0 + R + DOLFIN_EPS)) ? 0.0 : 1.0', x0 = x0, R = R ) 
 K  = interpolate(phi_I, P) # alternativt DG0 
-#plot(K, interactive = viz, title = 'K' )	
+plot(K, interactive = viz, title = 'K' )	
 #File('K_c105_n{}_s{}_e{}_alg{}.xdmf'.format(N, speed, epsilon, alg)) << K
-
-
 
 
 
@@ -67,14 +65,12 @@ interesting_domain_interpolate = interpolate(interesting_domain, DG1)#P)
 
 
 
-
-
 # Plotting the shear with high resolution
-def dg1_line_plot(function, resolution=100):
+def dg1_line_plot(function, resolution=1000):
 	x = numpy.linspace(-1, 1, resolution)      # Needs to be changed if the geometry changes
 	y = [function((xval, 0.0)) for xval in x]  # Skjaret over domenet som regnet ut i modellen 
-	#pyplot.plot(x, y, linestyle="--")
-	#pyplot.show()
+	pyplot.plot(x, y, linestyle="--")
+	pyplot.show()
 
 
 
@@ -102,8 +98,8 @@ def time_stepping(K, time):
 	tau_xy_ = tau_xy(u=u)
 	tau_xy_proj = project(tau_xy_, DG1) #P)  
 	#plot(tau_xy_proj, interactive = True, title = 'Shear')	
-	#dg1_line_plot(tau_xy_proj)	
-	File('shear_c105_n{}_t{}_s{}_e{}_alg{}.xdmf'.format(N, time, speed, epsilon, alg)) << tau_xy_proj
+	dg1_line_plot(tau_xy_proj)	
+	File('code1_shear_c105_n{}_t{}_s{}_e{}_alg{}.xdmf'.format(N, time, speed, epsilon, alg)) << tau_xy_proj
 	
 
 
@@ -122,7 +118,7 @@ def time_stepping(K, time):
 
 	indicator_ = indikator_test(space = DG1, Dirac_delta =interface_proj, tau_xy=tau_xy_proj, interesting_domain= interesting_domain_interpolate)
 	plot(indicator_, interactive = viz, title = 'Indicator')
-	File('Indicator_c105_n{}_t{}_s{}__e{}_alg{}.xdmf'.format(N, time, speed,epsilon,alg)) << interface_proj 
+	#File('Indicator_c105_n{}_t{}_s{}__e{}_alg{}.xdmf'.format(N, time, speed,epsilon,alg)) << interface_proj 
 
 
 
@@ -137,7 +133,7 @@ def time_stepping(K, time):
 	K_cap_ = K_cap(K_new)
 	K_cap_proj = project(K_cap_, K.function_space())
 	plot(K_cap_proj, interactive = viz, title = 'K cap' )
-	File('Kcap_c105_n{}_t{}_s{}_e{}_alg{}.xdmf'.format(N, time, speed, epsilon, alg)) << K_cap_proj 
+	#File('Kcap_c105_n{}_t{}_s{}_e{}_alg{}.xdmf'.format(N, time, speed, epsilon, alg)) << K_cap_proj 
 
 	return K_cap_proj  
 		 
@@ -161,12 +157,3 @@ for t in range(time_start, time_stop):
 
 
 
-
-
-
-
-
-
-
-
- 

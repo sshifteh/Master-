@@ -1,0 +1,39 @@
+******************Report for model 1:******************
+
+
+* Part I: Fysiology 
+
+subsection: Introduction
+subsection: Background
+subsection: the mathematics of blood.how is blood models. as a newtonian fluid. 
+And why this is fine. 
+
+------------------------
+
+
+* Part II: Mathematical theory
+
+section A: Continous:
+subsection: Level set, define characteristic function better, watch Strang Lecture perhaps  
+subsection: Stokes equations with boundary conditions 
+subsection: functions indicator etc and the function for wss on the boundary 
+
+
+section B: Discrete
+subsection: weak form 
+subsection: stability 
+subsection: fenics uses lu factorization to solve the inverse of the indefinite system.
+
+-----------------------------
+
+
+Part III: Experiment specific
+
+subsection: describe setup and comparison to the paper on WSS  
+subsection: images 
+subsection: implementation 
+(subsection: verification) 
+(subsection: method of manufactored solutions) 
+subsection: put the code out in a separate folde called Model 1 on github
+ 
+

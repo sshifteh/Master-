@@ -1,0 +1,62 @@
+"""
+	* Introduction: 
+	Solver for a the stokes problem with a penalty term with Fenics. 
+
+
+	* * THE MATHEMATICS: 
+	The stokes_solver is a function that solves the Stokes boundary value problem, by converting it to the weak
+	form by multiplying by a testfunction v and doing integration over the domain.
+	Consider the testfunction v as a virtual displacement close to the solution u (at least for now) 
+	Then a a penalty term is added. (what is the definition of a penalty term... wikipedia )
+	Consider that we now add a fourth term, alpha = C*k*u, inner(alpha(u, k), v)*dx 
+	This term is a so called penalty term. Whenever the domain is divided, the part of the domain with flow should have alpha term 		equate to zero and the part without flow should have alpha term go to infinity. 	
+	Based on literatuer we choose alpha. 
+
+
+	Strong form:
+		
+			- div*(grad(u))  +  grad(p)  = f  (conservation of momentum),
+					    div(u)   = 0   (conservation of mass)                       
+				    	 + boundary conditions.
+			
+	Weak form: 	
+
+	       inner(grad(u), grad(v))*dx +  div(v)*p*dx = inner(f,v)*dx
+					     div(u)*q*dx = 0  	
+
+
+	Modified weak form with penalty:  	
+
+		alpha = 0 if domain with flow, else infinity 
+		alpha = alpha(u) = C*k*u, C  = a high number 
+	       	inner(alpha(u, k), v)*dx + inner(grad(u), grad(v))*dx + div(u)*q*dx + div(v)*p*dx = 0
+	when C goes to infinity, the u in the first term in the equation above has to go to zero, 
+	for the entire equation to be zero. So the u is zero when C goes to infinity, and there should be no flow in
+	the part of the domain which has no fluid which is exactly what we wanted. Thus we conclude with having contstructed alpha 		properly. 	
+
+	Next we calculate the stress by using the U we get from the stokes solver. 
+	
+
+	* * * Argument: 
+	w : widt of the tube or special geometry
+	func: dunno really ?!?! 
+	n: number of mesh points. 	
+
+	
+	* * * * Discretization: 
+	Using a mixed functionspace. Quadratic 2nd order polynomials as basisfunctions(trial- and test- functions) for the velocity 		space(field). Linear lagrange polynomials for the pressure space(field).
+	Then these two field are mixed such that we have have a (x,y,p) evaluation at each point in the mesh. 
+	The trialfunctions are the ones we use to find the solution with, and the testfuncions are the ones used for making the weak form.
+	These have the same dimension. 
+	The stokes_solver function takes in a func argument 
+ 	
+
+	* * * * * Programming: 
+	Using Fenics. 	
+	special care, the func should be a Function object.
+
+	
+	
+"""
+
+

@@ -1,0 +1,62 @@
+* Part I: Fysiology 
+
+subsection a): Introduction
+subsection b): Background
+------------------------
+subsection a): Introduction:
+
+Relevans:	
+	3 % of strokes and 5% of stroke related deaths are because of subarachnoid hemorrhage(SAH). 
+	Almost 2 out of 3 affected are women. Population studies show that the mortality rate is about 50%.  
+	If survived, one out of three is left with permanent need of help in their everyday life.
+	That is why patients with suspect or proven subarchnoid hemmorage need treatment fast. 
+	(Tidskrift for den norske legeforening, S J Bakke　K-F Lindegaard, 2007)		
+
+	This project is a combination of medicine, molecular biology, mathematics and programming.
+	A better understanding of aneurysms growth and rupture will aid physicians in the future.
+	Also applications in general is useful from a mathematical point of view as well, they can 
+	introduce new branches in mathematical theory that had previously not been described in many cases.
+	 	
+
+subsection b): Background:
+
+Brain:
+	To understand what a cerebral aneurysm is we can begin by considering the blood supply to the brain.
+	The best angle is from underneath, see Figure 1a) (hjernen underifra).
+	Fra ryggraden går to grener av vertebral arterier opp til hjenen. Disse forenes til Basilar arterien. Denne forgrener seg igjen 	til en sirkel. Denne sirkelen kalles Willis sirkel. Willis sirkel sender ut flere forgreninger, posterior cerebral-, middle 		cerebral - og 	anterior cerebral arterier. Anterior cerebral arteriene blir forent av anterior kommuniserende arterien. Og 		posterior kommuniserende arterien forener midle og posterior cerebral arteriene. Utover disse er det to andre arterier som er med 		å forme Willis Sirkel, internal carotid arteriene. Willis sirkel kan betraktes som en elegant anatomisk struktur som representerer 		en sentral hub med forgreninger som sørger for blodtilførsel for hele hjernen.
+	Men den er ikke uten svakheter. 85 prosent av cerebrale aneurismer utvikles i Willis Sirkel. Det er flere steder hvor sirkelen 		forgrener ut (bifurcations). Arterieveggen svekkes lettere i forgreningsområdene og det dannes en aneurisme. Disse områdene er 		sirklet i Figure 1 b). 
+	
+Arteries and Circle of Willis: 
+	To understand aneurysms we have to start by understanding the structure of the arteries, see Figure 2. 
+	Arterier består av tre lag av muskelceller. Utenifra og inn starter vi med Tunica adventitia. Så kommer det mellomste laget Tunica 		media, og til slutt det innerste laget Tunica intima. Tunica intima er dekket med endotel celler.
+
+		Endotelcellene er helt essensielle for normal funksjon av hele sirkulasjons systemet. Disse er i direkte kontakt med 		blodstømmen. EC har spesialiserte reseptor på utsiden av cellemembranen. Disse kalless mekanosensorer fordi de responderer på 		mekanisk stimuli slik som strekk og stress og oversetter denne informasjonen til kjemiske signaler. Signalveier blir aktivert 		avhengig av blodstrømmens karakter, slik at gen - og proteinuttrykk blir endret og  arterieveggen remodellererer seg selv (Chien, 		2007). FIXME
+		Så tilbake til hvorfor så høy prosentandel av aneuryismer dannes i Willis sirkel.
+	Hvordan er blodstrømmen i Willis Sirkel forksjellig fra blodstrømmen andre steder i kroppen?
+	I rette arterier er blodstrømmen laminær så stress og strekk har veldefinerte retninger. I disse områdene aktiverer den laminære 		blodstrømmen normale responser hos endotelcellene.  I kuvede eller forgrenede områder derimot er ikke retningen av strekk og 		stress 	lenger den samme og vanskeligere å definere. Dessuten kan blodstrømmen gå over til transisjons- eller turbulentstrøm. 		Dette fører til andre cellulære responser enn de vanlige(Chien, 2007) som fører til anomali.
+	
+
+A study on the ECs:
+	In 1986 Peter Davis from Harvard Medical School together with others from the Department of mechanical engireering at MIT 		publishes a paper on how turbulent fluid shear stress induce vascular endothelial cell turnover. They isolated and cultured Bovine 		aortic endothelial cells on a glass coverslip. The confluent layer of cells were exposed to laminar and turbulent flow for 		different time periods. Immediately following exposure to flow, the coverslips of cells are moved to Petri dishes for incubation 		with the heaviest isotope of hydrogen, thymine for nuclear labeling of DNA, for 24 hours (Davies, 1986).
+		The confluent monolayer exposed to different types of flow show morphological changes. Before exposur to flow the cells 	were had a polygonam configuration with no direction. After exposed to laminar flow of 8 dyn/cm^2, the cells aligned with the 		direction of the flow and underwent morphological changes to take a ellipsoidal form. After 6hr of exposure to TF the cell shape   		became more variable and the no alignment was appearent. Also some cells had torn appart from the monolayer laying on top of it 	instead. The same result was appereant after 16 hr of TF of 3, 5, 14 dyn/cm^2 shear stres.
+	The nuclear labeling following the exposure to flow show a significant higher turover of cells exposed to TF than LF.
+	Turnover of cells exposed to LF is the same as the control of cells not exposed to any flow.
+		The biggest change in cells exposed to LF is the orientation, that is the change in the cytosceleton. This did not bring 		about a high turnovover. So change in cytosceleton is not a criteria for growth, that is the direction of the flow is not 		the a criteria for growth. The EC monolayer is hindered from growing because of the attachment to the neighbouring cells. Once the 		monolayer is compromised cells enter cell cycle and grow. 
+	
+	In 2006 Chien et al publish a comprehensive paper on the mechanotransduction in the ECs response to shear strech and stress on a 
+	molecular level. Figure 1. 
+	
+
+			
+CFD experiments and statistic significance:
+	pass 	
+				
+
+
+Viskosity models for hemodynamics:
+	pass 
+	
+	
+		
+
+

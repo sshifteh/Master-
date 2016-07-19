@@ -1,0 +1,100 @@
+* Part II: Mathematical theory
+
+section A: Continous:--------------
+subsection: Level set, 2D example, define characteristic function better
+subsection: Stokes equations with boundary conditions 
+subsection: Functions ,indicator etc and the function for wss on the boundary 
+
+
+section B: Discrete---------------
+subsection: weak form 
+subsection: stability 
+subsection: fenics uses lu factorization to solve the inverse of the indefinite system.
+
+----------------------------------
+
+
+Section A: 
+subsection: Level set methods: 
+	
+	The level set approach was introduced by Osher and Sethian in the 1980's. 	
+	When simulations of moving interphases play a crusial role in the problem to be solved, 
+	level set methods are very useful.
+
+	Of course other methods can be used as well, but they will eventually fail. 
+	Consider a curve as a moving firefront. Each point on that curve will move to another point from
+	t= 0 to t=1. The curve could be described with an ODE for position followed by interpolation.
+	However this approach falls short numerically.
+
+	Consider the very simple 1D example, 
+	Suppose we want to divide the Real number line into three distinct parts with -1 and 1. 
+	We define the three subdomains ,
+
+	Outer domain: 
+	Inner domain:
+	Boundary domain:
+
+	The outer domain consists of two distinc parts belonging to the same domain.
+	Notice the outer and inner domain are of one dimention higher than the boundary domain.
+	Generally in R^n this is the case. And we say that the boundary domain has codimention n-1. 
+	In the explicit boundary representation the boundary consists of the set of points on the boundary.
+	In this example that would be {-1,1}.
+	In an implicit boundary representation the boundary is the isocontoures(equipotential lines?) of a function.
+	Lets call this function phi(x).
+	Phi(x) would be any function that gives boundary points {-1,1}.
+	Suppose phi(x) is 
+		phi(x)= x^2 -1
+	and the isocontour phi(x) = 0 gives the boundary points we wanted.
+	Figure 1.
+
+	In 2D our lower dimentional interface is a curve that separates R^2. Consider the curve to be 
+	closed such that we get distinct areas. Suppose the implicit function is 
+		phi(x,y) = x^2 + y^2 -1 
+	then phi is a bowl in 3D. 
+	The zero isocontour is a plane at zero that cuts the bowl and gives the lower dimentional unit circle in this particular case.
+	Interior region:
+	Exterior region:
+	Boundary region: 
+	Figure 2.
+	In 2D the explicit function needs to specify all the points on that curve. It wouldnt be too difficult in this case.
+	However with a more complicated curve it could be. In general one would parametrize the curve with a vector function 
+	x(t) moving along the curve. 
+	So far I have used analytical expressions. Usually these are not available. Numerically the parameter could be discritized into a 		set of points. Still the parametrized representation would fall short for more complicated curves.
+	Consider a three dimenstional function describing shaped as a a mountaintop a valley and then a second top.
+	The isocontours of this in 2D would start from the top as two unconnected circles.
+	Then they would met and form a eight. Which introduces a change in topology.
+	Level set methods deal with that easily.
+	
+
+	Fluidet er beskrevet med Stokes ligningene med boundary conditions,
+	
+	Resten er grei som den er i latex.
+	
+	Ting som må tilføyes er 
+		- finite element space for wss etc. rom for diskretisering.	
+		- 
+
+
+section B: Discretization---------------
+	subsection: weak form 
+	subsection: stability 
+	subsection: fenics uses lu factorization to solve the inverse of the indefinite system.
+	
+	start with the space of the implicit funtion, then move over to the 
+	weak form of the Stokes,
+	then put it in matrix form, 
+	discuss that and finally say how fenics solves it 
+	
+	
+	
+
+	
+	
+		
+	 	
+	
+	
+	
+	
+	
+
